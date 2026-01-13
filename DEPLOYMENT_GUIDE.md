@@ -147,6 +147,37 @@ pm2 startup  # Follow the command it outputs
 
 ---
 
+## Part 4.5: Create Super Admin Account
+
+### Run the admin creation script:
+```bash
+cd /var/www/powertradefx/backend
+node scripts/createAdmin.js
+```
+
+This creates a Super Admin with:
+| Field | Value |
+|-------|-------|
+| **Email** | admin@powertradefx.com |
+| **Password** | Admin@123 |
+| **Role** | SUPER_ADMIN |
+| **URL Slug** | powertradefx |
+
+⚠️ **IMPORTANT:** Change the password immediately after first login!
+
+### Admin Panel URL:
+```
+https://powertradefx.com/admin/login
+```
+
+### To create admin with custom credentials:
+Edit `backend/scripts/createAdmin.js` and change:
+- Line 79: `email: 'your-email@example.com'`
+- Line 80: `bcrypt.hash('YourPassword123', 12)`
+- Line 85: `urlSlug: 'your-slug'`
+
+---
+
 ## Part 5: Configure Frontend
 
 ### 5.1 Create Frontend Environment File
