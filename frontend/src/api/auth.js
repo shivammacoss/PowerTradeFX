@@ -18,7 +18,7 @@ export const signup = async (userData) => {
 }
 
 export const login = async (credentials) => {
-  const response = await fetch(`${AUTH_URL}/admin/login`, {
+  const response = await fetch(`${API_URL}/admin-mgmt/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -187,6 +187,7 @@ const Signup = () => {
         body: JSON.stringify({ email: formData.email, firstName: formData.firstName })
       })
       const data = await res.json()
+      console.log('Send OTP response:', res.status, data)
       if (res.ok) {
         setStep('otp')
         setResendTimer(60)
