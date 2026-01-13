@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { X, Mail, ChevronDown, Search, Eye, EyeOff, ArrowLeft, RefreshCw } from 'lucide-react'
 import { signup } from '../api/auth'
 
-const API_URL = 'http://localhost:5001/api'
+import { API_URL } from '../config/api'
 
 // OTP Input Component
 const OTPInput = ({ value, onChange, length = 6 }) => {
