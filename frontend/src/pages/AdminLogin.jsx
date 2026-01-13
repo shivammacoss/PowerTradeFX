@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { adminLogin } from '../api/auth'
 
 const AdminLogin = () => {
   const navigate = useNavigate()
@@ -22,15 +23,16 @@ const AdminLogin = () => {
     setLoading(true)
     setError('')
     
-    // Simple admin credentials check (in production, use proper backend auth)
-    if (formData.email === 'admin@admin.com' && formData.password === 'admin123') {
-      localStorage.setItem('adminToken', 'admin-authenticated')
-      localStorage.setItem('adminUser', JSON.stringify({ email: formData.email, role: 'admin' }))
+    try {
+      const response = await adminLogin(formData)
+      localStorage.setItem('adminToken', response.token)
+      localStorage.setItem('adminUser', JSON.stringify(response.admin))
       navigate('/admin/dashboard')
-    } else {
-      setError('Invalid admin credentials')
+    } catch (err) {
+      setError(err.message || 'Invalid admin credentials')
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   return (
