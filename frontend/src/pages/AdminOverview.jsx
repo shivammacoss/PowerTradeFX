@@ -5,8 +5,6 @@ import {
   TrendingUp,
   Wallet,
   CreditCard,
-  ArrowUpRight,
-  ArrowDownRight,
   RefreshCw,
   Calendar
 } from 'lucide-react'
@@ -31,19 +29,20 @@ const AdminOverview = () => {
   const fetchData = async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${API_URL}/admin/users`)
-      if (response.ok) {
-        const data = await response.json()
-        const userList = data.users || []
-        setUsers(userList)
-        setStats({
-          totalUsers: userList.length,
-          activeToday: Math.floor(userList.length * 0.7),
-          newThisWeek: Math.floor(userList.length * 0.3),
-          totalDeposits: 125000,
-          totalWithdrawals: 45000,
-          pendingKYC: Math.floor(userList.length * 0.2)
-        })
+      // Fetch users
+      const usersResponse = await fetch(`${API_URL}/admin/users`)
+      if (usersResponse.ok) {
+        const usersData = await usersResponse.json()
+        setUsers(usersData.users || [])
+      }
+
+      // Fetch real dashboard stats
+      const statsResponse = await fetch(`${API_URL}/admin/dashboard-stats`)
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json()
+        if (statsData.success) {
+          setStats(statsData.stats)
+        }
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -65,32 +64,28 @@ const AdminOverview = () => {
       value: stats.totalUsers, 
       icon: Users, 
       color: 'blue',
-      change: '+12%',
-      positive: true
+      subtitle: `${stats.newThisWeek || 0} new this week`
     },
     { 
       title: 'Active Today', 
       value: stats.activeToday, 
       icon: TrendingUp, 
       color: 'green',
-      change: '+5%',
-      positive: true
+      subtitle: `${stats.pendingKYC || 0} pending KYC`
     },
     { 
       title: 'Total Deposits', 
-      value: `$${stats.totalDeposits.toLocaleString()}`, 
+      value: `$${(stats.totalDeposits || 0).toLocaleString()}`, 
       icon: Wallet, 
       color: 'purple',
-      change: '+18%',
-      positive: true
+      subtitle: `${stats.pendingDeposits || 0} pending`
     },
     { 
       title: 'Total Withdrawals', 
-      value: `$${stats.totalWithdrawals.toLocaleString()}`, 
+      value: `$${(stats.totalWithdrawals || 0).toLocaleString()}`, 
       icon: CreditCard, 
       color: 'orange',
-      change: '-3%',
-      positive: false
+      subtitle: `${stats.pendingWithdrawals || 0} pending`
     },
   ]
 
@@ -104,13 +99,10 @@ const AdminOverview = () => {
               <div className={`w-10 h-10 bg-${stat.color}-500/20 rounded-lg flex items-center justify-center`}>
                 <stat.icon size={20} className={`text-${stat.color}-500`} />
               </div>
-              <div className={`flex items-center gap-1 text-sm ${stat.positive ? 'text-green-500' : 'text-red-500'}`}>
-                {stat.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                {stat.change}
-              </div>
             </div>
             <p className="text-gray-500 text-sm mb-1">{stat.title}</p>
             <p className="text-white text-2xl font-bold">{stat.value}</p>
+            <p className="text-gray-500 text-xs mt-1">{stat.subtitle}</p>
           </div>
         ))}
       </div>
@@ -185,7 +177,7 @@ const AdminOverview = () => {
                 </div>
                 <span className="text-gray-400">Active Trades</span>
               </div>
-              <span className="text-white font-semibold">156</span>
+              <span className="text-white font-semibold">{stats.activeTrades || 0}</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-dark-700 rounded-lg">
               <div className="flex items-center gap-3">
@@ -194,7 +186,7 @@ const AdminOverview = () => {
                 </div>
                 <span className="text-gray-400">Pending Withdrawals</span>
               </div>
-              <span className="text-white font-semibold">12</span>
+              <span className="text-white font-semibold">{stats.pendingWithdrawals || 0}</span>
             </div>
           </div>
         </div>
