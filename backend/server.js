@@ -228,7 +228,7 @@ app.use('/api/email-templates', emailTemplatesRoutes)
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ message: 'CoinLytix API is running' })
+  res.json({ message: 'PowerTradeFX API is running' })
 })
 
 const PORT = process.env.PORT || 5000

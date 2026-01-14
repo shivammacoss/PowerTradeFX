@@ -3,8 +3,70 @@ import bcrypt from 'bcryptjs'
 import User from '../models/User.js'
 import EmailSettings from '../models/EmailSettings.js'
 import { sendEmail } from '../services/emailService.js'
+import Transaction from '../models/Transaction.js'
+import KYC from '../models/KYC.js'
+import Trade from '../models/Trade.js'
 
 const router = express.Router()
+
+// GET /api/admin/dashboard-stats - Get real dashboard statistics
+router.get('/dashboard-stats', async (req, res) => {
+  try {
+    // Get user stats
+    const totalUsers = await User.countDocuments()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const activeToday = await User.countDocuments({ lastLogin: { $gte: today } })
+    
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    const newThisWeek = await User.countDocuments({ createdAt: { $gte: weekAgo } })
+
+    // Get deposit stats (approved deposits)
+    const depositStats = await Transaction.aggregate([
+      { $match: { type: 'Deposit', status: 'Approved' } },
+      { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
+    ])
+
+    // Get withdrawal stats (approved withdrawals)
+    const withdrawalStats = await Transaction.aggregate([
+      { $match: { type: 'Withdrawal', status: 'Approved' } },
+      { $group: { _id: null, total: { $sum: '$amount' }, count: { $sum: 1 } } }
+    ])
+
+    // Get pending transactions
+    const pendingDeposits = await Transaction.countDocuments({ type: 'Deposit', status: 'Pending' })
+    const pendingWithdrawals = await Transaction.countDocuments({ type: 'Withdrawal', status: 'Pending' })
+
+    // Get KYC stats
+    const pendingKYC = await KYC.countDocuments({ status: 'pending' })
+    const approvedKYC = await KYC.countDocuments({ status: 'approved' })
+
+    // Get active trades count
+    const activeTrades = await Trade.countDocuments({ status: 'OPEN' })
+
+    res.json({
+      success: true,
+      stats: {
+        totalUsers,
+        activeToday,
+        newThisWeek,
+        totalDeposits: depositStats[0]?.total || 0,
+        totalWithdrawals: withdrawalStats[0]?.total || 0,
+        depositCount: depositStats[0]?.count || 0,
+        withdrawalCount: withdrawalStats[0]?.count || 0,
+        pendingDeposits,
+        pendingWithdrawals,
+        pendingKYC,
+        approvedKYC,
+        activeTrades
+      }
+    })
+  } catch (error) {
+    console.error('Error fetching dashboard stats:', error)
+    res.status(500).json({ success: false, message: 'Error fetching stats', error: error.message })
+  }
+})
 
 // GET /api/admin/users - Get all users
 router.get('/users', async (req, res) => {
