@@ -1,0 +1,247 @@
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { 
+  LayoutDashboard, 
+  Users,
+  LogOut,
+  TrendingUp,
+  Wallet,
+  Building2,
+  UserCog,
+  DollarSign,
+  IndianRupee,
+  Copy,
+  Trophy,
+  CreditCard,
+  Shield,
+  FileCheck,
+  HeadphonesIcon,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronRight,
+  Palette,
+  Mail,
+  Gift,
+  User,
+  Send
+} from 'lucide-react'
+import logoImage from '../assets/PowerTradeFX.png'
+
+const AdminLayout = ({ children, title, subtitle, requiredPermission }) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [sidebarExpanded, setSidebarExpanded] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [expandedSections, setExpandedSections] = useState({})
+  const [adminUser, setAdminUser] = useState(null)
+
+  // Get admin user from localStorage
+  useEffect(() => {
+    const storedAdmin = localStorage.getItem('adminUser')
+    if (storedAdmin) {
+      setAdminUser(JSON.parse(storedAdmin))
+    }
+  }, [])
+
+  const isSuperAdmin = adminUser?.role === 'SUPER_ADMIN'
+  const isEmployee = adminUser?.role === 'EMPLOYEE'
+  const isAdmin = adminUser?.role === 'ADMIN'
+  const sidebarPermissions = adminUser?.sidebarPermissions || {}
+
+  // Check if employee has sidebar permission
+  const hasSidebarPermission = (sidebarKey) => {
+    if (isSuperAdmin) return true
+    if (isEmployee) return sidebarPermissions[sidebarKey] === true
+    return true // Regular admins see all their features
+  }
+
+  // Menu items - admins see all features for their users, super admin sees everything
+  const allMenuItems = [
+    { name: 'Overview Dashboard', icon: LayoutDashboard, path: '/admin/dashboard', superAdminOnly: false, sidebarKey: 'dashboard' },
+    { name: 'User Management', icon: Users, path: '/admin/users', superAdminOnly: false, sidebarKey: 'userManagement' },
+    { name: 'Trade Management', icon: TrendingUp, path: '/admin/trades', superAdminOnly: false, sidebarKey: 'tradeManagement' },
+    { name: 'Fund Management', icon: Wallet, path: '/admin/funds', superAdminOnly: false, sidebarKey: 'fundManagement' },
+    { name: 'Fund Requests', icon: Send, path: '/admin/fund-requests', superAdminOnly: false, sidebarKey: 'fundManagement' },
+    { name: 'Bank Settings', icon: Building2, path: '/admin/bank-settings', superAdminOnly: false, sidebarKey: 'bankSettings' },
+    { name: 'IB Management', icon: UserCog, path: '/admin/ib-management', superAdminOnly: false, sidebarKey: 'ibManagement' },
+    { name: 'Forex Charges', icon: DollarSign, path: '/admin/forex-charges', superAdminOnly: false, sidebarKey: 'forexCharges' },
+    { name: 'Earnings Report', icon: TrendingUp, path: '/admin/earnings', superAdminOnly: false, sidebarKey: 'earningsReport' },
+    { name: 'Copy Trade Management', icon: Copy, path: '/admin/copy-trade', superAdminOnly: false, sidebarKey: 'copyTrade' },
+    { name: 'Prop Firm Challenges', icon: Trophy, path: '/admin/prop-firm', superAdminOnly: false, sidebarKey: 'propFirm' },
+    { name: 'Account Types', icon: CreditCard, path: '/admin/account-types', superAdminOnly: false, sidebarKey: 'accountTypes' },
+    { name: 'Theme Settings', icon: Palette, path: '/admin/theme', superAdminOnly: false, sidebarKey: 'themeSettings' },
+    { name: 'Email Templates', icon: Mail, path: '/admin/email-templates', superAdminOnly: false, sidebarKey: 'emailTemplates' },
+    { name: 'Bonus Management', icon: Gift, path: '/admin/bonus-management', superAdminOnly: false, sidebarKey: 'bonusManagement' },
+    { name: 'Admin Management', icon: Shield, path: '/admin/admin-management', superAdminOnly: true, sidebarKey: 'adminManagement' },
+    { name: 'Employee Management', icon: UserCog, path: '/admin/employees', superAdminOnly: true, sidebarKey: 'employeeManagement' },
+    { name: 'KYC Verification', icon: FileCheck, path: '/admin/kyc', superAdminOnly: false, sidebarKey: 'kycVerification' },
+    { name: 'Support Tickets', icon: HeadphonesIcon, path: '/admin/support', superAdminOnly: false, sidebarKey: 'supportTickets' },
+    { name: 'My Profile', icon: User, path: '/admin/profile', superAdminOnly: false, sidebarKey: null }, // Always visible
+  ]
+
+  // Filter menu items based on role
+  const menuItems = allMenuItems.filter(item => {
+    // Profile is always visible
+    if (item.sidebarKey === null) return true
+    
+    // Super admin only items
+    if (item.superAdminOnly && !isSuperAdmin) return false
+    
+    // For employees, check sidebar permissions
+    if (isEmployee) {
+      return hasSidebarPermission(item.sidebarKey)
+    }
+    
+    // Regular admins see all their features (no permission checks needed)
+    return true
+  })
+
+  useEffect(() => {
+    const adminToken = localStorage.getItem('adminToken')
+    if (!adminToken) {
+      navigate('/admin')
+    }
+  }, [navigate])
+
+  // Check page-level permission (only for super admin only pages)
+  useEffect(() => {
+    if (requiredPermission === 'canManageAdmins' && adminUser && !isSuperAdmin) {
+      navigate('/admin/dashboard')
+    }
+    if (requiredPermission === 'canManageEmployees' && adminUser && !isSuperAdmin) {
+      navigate('/admin/dashboard')
+    }
+  }, [requiredPermission, adminUser, isSuperAdmin, navigate])
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('adminUser')
+    navigate('/admin')
+  }
+
+  const isActive = (path) => location.pathname === path
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }))
+  }
+
+  return (
+    <div className="min-h-screen bg-dark-900 flex">
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside 
+        className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          ${sidebarExpanded ? 'w-64' : 'w-16'} 
+          ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          bg-dark-900 border-r border-gray-800 flex flex-col 
+          transition-all duration-300 ease-in-out
+        `}
+      >
+        {/* Logo */}
+        <div className="p-4 flex items-center justify-between border-b border-gray-800">
+          <div className="flex items-center gap-2">
+            <img src={logoImage} alt="PowerTradeFX" className="h-8 w-auto object-contain flex-shrink-0" />
+            {sidebarExpanded && (
+              <div className="flex flex-col">
+                <span className="text-white font-semibold">PowerTradeFX</span>
+                <span className="text-xs text-gray-400">
+                  {isSuperAdmin ? 'Super Admin' : isEmployee ? 'Employee' : isAdmin ? 'Admin' : 'Admin'}
+                </span>
+              </div>
+            )}
+          </div>
+          <button 
+            onClick={() => setSidebarExpanded(!sidebarExpanded)}
+            className="hidden lg:block p-1 hover:bg-dark-700 rounded transition-colors"
+          >
+            <Menu size={18} className="text-gray-400" />
+          </button>
+          <button 
+            onClick={() => setMobileMenuOpen(false)}
+            className="lg:hidden p-1 hover:bg-dark-700 rounded transition-colors"
+          >
+            <X size={18} className="text-gray-400" />
+          </button>
+        </div>
+
+        {/* Menu */}
+        <nav className="flex-1 px-2 py-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
+          {menuItems.map((item) => (
+            <button
+              key={item.name}
+              onClick={() => {
+                navigate(item.path)
+                setMobileMenuOpen(false)
+              }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors ${
+                isActive(item.path)
+                  ? 'bg-red-500 text-white' 
+                  : 'text-gray-400 hover:text-white hover:bg-dark-700'
+              }`}
+              title={!sidebarExpanded ? item.name : ''}
+            >
+              <item.icon size={18} className="flex-shrink-0" />
+              {sidebarExpanded && (
+                <span className="text-sm font-medium whitespace-nowrap truncate">{item.name}</span>
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* Logout */}
+        <div className="p-2 border-t border-gray-800">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:text-white hover:bg-dark-700 transition-colors rounded-lg"
+            title={!sidebarExpanded ? 'Log Out' : ''}
+          >
+            <LogOut size={18} className="flex-shrink-0" />
+            {sidebarExpanded && <span className="text-sm font-medium whitespace-nowrap">Log Out</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto min-w-0">
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-dark-900/95 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-800">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2 hover:bg-dark-700 rounded-lg transition-colors"
+            >
+              <Menu size={20} className="text-gray-400" />
+            </button>
+            <div>
+              <h1 className="text-lg sm:text-xl font-semibold text-white">{title || 'Admin Dashboard'}</h1>
+              {subtitle && <p className="text-gray-500 text-sm hidden sm:block">{subtitle}</p>}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 text-red-500 rounded-full text-xs sm:text-sm">
+            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+            <span className="hidden sm:inline">Admin Mode</span>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="p-4 sm:p-6">
+          {children}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export default AdminLayout
