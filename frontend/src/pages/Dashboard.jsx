@@ -23,8 +23,10 @@ import {
   Moon
 } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
-import { API_URL } from '../config/api'
+import { API_BASE_URL, API_URL } from '../config/api'
 import logoImage from '../assets/PowerTradeFX.png'
+
+const ENABLE_COINGECKO_NEWS = false
 
 const Dashboard = () => {
   const navigate = useNavigate()
@@ -39,6 +41,8 @@ const Dashboard = () => {
   const [totalTrades, setTotalTrades] = useState(0)
   const [totalCharges, setTotalCharges] = useState(0)
   const [totalPnl, setTotalPnl] = useState(0)
+  const [banners, setBanners] = useState([])
+  const [activeBanner, setActiveBanner] = useState(0)
   const [userAccounts, setUserAccounts] = useState([])
   const [challengeModeEnabled, setChallengeModeEnabled] = useState(false)
   const tradingViewRef = useRef(null)
@@ -103,6 +107,35 @@ const Dashboard = () => {
       fetchUserAccounts()
     }
   }, [user._id])
+
+  const resolveImageUrl = (url) => {
+    if (!url) return ''
+    if (url.startsWith('http://') || url.startsWith('https://')) return url
+    return `${API_BASE_URL}${url}`
+  }
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch(`${API_URL}/banners/public/active`)
+        const data = await res.json()
+        if (data.success) {
+          setBanners(data.banners || [])
+        }
+      } catch (error) {
+        console.error('Failed to load banners', error)
+      }
+    }
+    fetchBanners()
+  }, [])
+
+  useEffect(() => {
+    if (!banners.length) return
+    const interval = setInterval(() => {
+      setActiveBanner((prev) => (prev + 1) % banners.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [banners.length])
   
   // Fetch trades after accounts are loaded
   useEffect(() => {
@@ -184,13 +217,17 @@ const Dashboard = () => {
     const fetchNews = async () => {
       setNewsLoading(true)
       try {
-        // Using CoinGecko's free API for crypto news (no API key needed)
-        const response = await fetch('https://api.coingecko.com/api/v3/news')
-        if (response.ok) {
-          const data = await response.json()
-          setNews(data.data?.slice(0, 6) || [])
-        } else {
-          // Fallback sample news if API fails
+        if (ENABLE_COINGECKO_NEWS) {
+          const response = await fetch('https://api.coingecko.com/api/v3/news')
+          if (response.ok) {
+            const data = await response.json()
+            setNews(data.data?.slice(0, 6) || [])
+          } else {
+            throw new Error(`News fetch failed: ${response.status}`)
+          }
+        }
+
+        if (!ENABLE_COINGECKO_NEWS) {
           setNews([
             { title: 'Bitcoin Surges Past $100K Milestone', description: 'BTC reaches new all-time high amid institutional buying', updated_at: Date.now(), url: '#' },
             { title: 'Ethereum 2.0 Staking Rewards Increase', description: 'ETH staking yields hit 5.2% APY', updated_at: Date.now() - 3600000, url: '#' },
@@ -278,7 +315,7 @@ const Dashboard = () => {
     
     // TradingView Timeline Widget (News)
     if (tradingViewRef.current) {
-      tradingViewRef.current.innerHTML = ''
+      tradingViewRef.current.innerHTML = '<div class="tradingview-widget-container__widget h-full"></div>'
       const script = document.createElement('script')
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js'
       script.async = true
@@ -296,7 +333,7 @@ const Dashboard = () => {
 
     // TradingView Economic Calendar Widget
     if (economicCalendarRef.current) {
-      economicCalendarRef.current.innerHTML = ''
+      economicCalendarRef.current.innerHTML = '<div class="tradingview-widget-container__widget h-full"></div>'
       const script = document.createElement('script')
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-events.js'
       script.async = true
@@ -314,7 +351,7 @@ const Dashboard = () => {
 
     // TradingView Forex Heatmap Widget
     if (forexHeatmapRef.current) {
-      forexHeatmapRef.current.innerHTML = ''
+      forexHeatmapRef.current.innerHTML = '<div class="tradingview-widget-container__widget h-full"></div>'
       const script = document.createElement('script')
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-forex-heat-map.js'
       script.async = true
@@ -331,7 +368,7 @@ const Dashboard = () => {
 
     // TradingView Forex Screener Widget
     if (forexScreenerRef.current) {
-      forexScreenerRef.current.innerHTML = ''
+      forexScreenerRef.current.innerHTML = '<div class="tradingview-widget-container__widget h-full"></div>'
       const script = document.createElement('script')
       script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-screener.js'
       script.async = true
@@ -445,6 +482,39 @@ const Dashboard = () => {
 
         {/* Dashboard Content */}
         <div className="p-6">
+          {banners.length > 0 && (
+            <div className={`relative rounded-xl border overflow-hidden mb-6 ${isDarkMode ? 'border-gray-800 bg-black/20' : 'border-gray-200 bg-white'}`}>
+              <div className="absolute top-3 right-3 z-10 flex gap-2">
+                {banners.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveBanner(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-colors ${index === activeBanner ? 'bg-white' : 'bg-white/30'}`}
+                    aria-label={`Show banner ${index + 1}`}
+                    type="button"
+                  />
+                ))}
+              </div>
+
+              <div
+                className="flex transition-transform duration-700"
+                style={{ transform: `translateX(-${activeBanner * 100}%)` }}
+              >
+                {banners.map((banner, index) => (
+                  <div key={banner._id || index} className="min-w-full">
+                    <div className={`w-full h-[200px] sm:h-[260px] lg:h-[320px] ${isDarkMode ? 'bg-black' : 'bg-gray-100'}`}>
+                      <img
+                        src={resolveImageUrl(banner.imageUrl)}
+                        alt={banner.title || 'Banner'}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Top Stats Boxes */}
           <div className="grid grid-cols-4 gap-4 mb-6">
             {/* Wallet Box */}

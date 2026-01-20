@@ -24,7 +24,8 @@ import {
   Mail,
   Gift,
   User,
-  Send
+  Send,
+  Image as ImageIcon
 } from 'lucide-react'
 import logoImage from '../assets/PowerTradeFX.png'
 
@@ -73,7 +74,7 @@ const AdminLayout = ({ children, title, subtitle, requiredPermission }) => {
     { name: 'Theme Settings', icon: Palette, path: '/admin/theme', superAdminOnly: false, sidebarKey: 'themeSettings' },
     { name: 'Email Templates', icon: Mail, path: '/admin/email-templates', superAdminOnly: false, sidebarKey: 'emailTemplates' },
     { name: 'Bonus Management', icon: Gift, path: '/admin/bonus-management', superAdminOnly: false, sidebarKey: 'bonusManagement' },
-    { name: 'Admin Management', icon: Shield, path: '/admin/admin-management', superAdminOnly: true, sidebarKey: 'adminManagement' },
+    { name: 'Banner Management', icon: ImageIcon, path: '/admin/banners', superAdminOnly: true, sidebarKey: 'bannerManagement' },
     { name: 'Employee Management', icon: UserCog, path: '/admin/employees', superAdminOnly: true, sidebarKey: 'employeeManagement' },
     { name: 'KYC Verification', icon: FileCheck, path: '/admin/kyc', superAdminOnly: false, sidebarKey: 'kycVerification' },
     { name: 'Support Tickets', icon: HeadphonesIcon, path: '/admin/support', superAdminOnly: false, sidebarKey: 'supportTickets' },
@@ -110,6 +111,9 @@ const AdminLayout = ({ children, title, subtitle, requiredPermission }) => {
       navigate('/admin/dashboard')
     }
     if (requiredPermission === 'canManageEmployees' && adminUser && !isSuperAdmin) {
+      navigate('/admin/dashboard')
+    }
+    if (requiredPermission === 'canManageBanners' && adminUser && !isSuperAdmin) {
       navigate('/admin/dashboard')
     }
   }, [requiredPermission, adminUser, isSuperAdmin, navigate])

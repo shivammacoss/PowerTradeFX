@@ -31,6 +31,7 @@ const AdminOverview = () => {
     activeTrades: 0
   })
   const isSuperAdmin = adminUser?.role === 'SUPER_ADMIN'
+  const isEmployee = adminUser?.role === 'EMPLOYEE'
 
   useEffect(() => {
     const storedAdmin = localStorage.getItem('adminUser')
@@ -150,9 +151,18 @@ const AdminOverview = () => {
     },
   ]
 
+  let overviewSubtitle = 'Welcome back, Admin'
+  if (adminUser?.role === 'EMPLOYEE') {
+    overviewSubtitle = 'Welcome back, Employee'
+  } else if (adminUser?.role === 'SUPER_ADMIN') {
+    overviewSubtitle = 'Welcome back, Super Admin'
+  }
+
+  const showAdminCards = !isSuperAdmin && adminUser?.role !== 'EMPLOYEE'
+
   return (
-    <AdminLayout title="Overview Dashboard" subtitle="Welcome back, Admin">
-      {!isSuperAdmin && (
+    <AdminLayout title="Overview Dashboard" subtitle={overviewSubtitle}>
+      {showAdminCards && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           <div className="bg-dark-800 rounded-xl p-5 border border-gray-800">
             <div className="flex items-center justify-between mb-4">

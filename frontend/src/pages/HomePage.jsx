@@ -6,6 +6,8 @@ import {
   Menu, X
 } from 'lucide-react'
 import logoImage from '../assets/PowerTradeFX.png'
+import heroVideo from '../assets/protradefxvideo.mp4'
+import { API_BASE_URL, API_URL } from '../config/api'
 
 // ============ NAVBAR COMPONENT ============
 const Navbar = () => {
@@ -132,6 +134,39 @@ const Navbar = () => {
 // ============ HERO COMPONENT ============
 const Hero = () => {
   const navigate = useNavigate()
+  const [banners, setBanners] = useState([])
+  const [activeBanner, setActiveBanner] = useState(0)
+  const [loadingBanners, setLoadingBanners] = useState(true)
+
+  const resolveImageUrl = (url) => {
+    if (!url) return ''
+    if (url.startsWith('http://') || url.startsWith('https://')) return url
+    return `${API_BASE_URL}${url}`
+  }
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await fetch(`${API_URL}/banners/public/active`)
+        const data = await res.json()
+        if (data.success) {
+          setBanners(data.banners || [])
+        }
+      } catch (error) {
+        console.error('Failed to load banners', error)
+      }
+      setLoadingBanners(false)
+    }
+    fetchBanners()
+  }, [])
+
+  useEffect(() => {
+    if (!banners.length) return
+    const interval = setInterval(() => {
+      setActiveBanner(prev => (prev + 1) % banners.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [banners.length])
 
   return (
     <section className="relative w-full overflow-hidden bg-black text-white">
@@ -144,7 +179,7 @@ const Hero = () => {
           className="w-full h-full object-cover object-center"
           poster="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/df683367-7790-4791-bf67-54d56d7ef621-ankar-ai/assets/images/OXXnRWwOHTLxnj6fGttTq13VSI-1.png"
         >
-          <source src="/assets/setupfx%20video.mp4" type="video/mp4" />
+          <source src={heroVideo} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
       </div>
@@ -677,7 +712,6 @@ const CrmSolutions = () => {
                   </div>
                 </div>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
                 <div className="bg-[#1a1a1a] rounded-3xl p-6 border border-white/10 shadow-2xl transform translate-x-4 md:translate-x-0 transition-transform duration-500 hover:scale-105">
                   <div className="flex items-center gap-4 mb-4">
