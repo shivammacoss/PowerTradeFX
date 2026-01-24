@@ -120,7 +120,7 @@ router.get('/referral-link/:userId', async (req, res) => {
       return res.status(404).json({ message: 'Active IB profile not found' })
     }
 
-    const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5173'
+    const baseUrl = process.env.FRONTEND_URL || 'https://powertradefx.com'
     const referralLink = `${baseUrl}/signup?ref=${ibUser.referralCode}`
 
     res.json({ 

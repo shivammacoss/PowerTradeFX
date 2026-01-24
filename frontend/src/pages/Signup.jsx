@@ -314,7 +314,7 @@ const Signup = () => {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/document-uploads/PowerTradeFX-logo-1766736768413.png?width=8000&height=8000&resize=contain" 
+            src="/assets/PowerTradeFX.png" 
             alt="PowerTradeFX Logo" 
             className="h-12 w-auto object-contain"
           />

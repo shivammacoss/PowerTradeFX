@@ -206,7 +206,7 @@ router.post('/signup', async (req, res) => {
       firstName: user.firstName,
       email: user.email,
       platformName: emailSettings?.fromName || 'Trading Platform',
-      loginUrl: 'http://localhost:5173/login',
+      loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
       supportEmail: emailSettings?.fromEmail || 'support@example.com',
       year: new Date().getFullYear().toString()
     })
