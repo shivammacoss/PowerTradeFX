@@ -316,7 +316,7 @@ const Signup = () => {
           <img 
             src="/assets/PowerTradeFX.png" 
             alt="PowerTradeFX Logo" 
-            className="h-12 w-auto object-contain"
+            className="h-20 w-auto object-contain"
           />
         </div>
 

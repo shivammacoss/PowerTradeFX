@@ -397,7 +397,7 @@ const Dashboard = () => {
       >
         {/* Logo - Icon only */}
         <div className="p-4 flex items-center justify-center shrink-0">
-          <img src={logoImage} alt="PowerTradeFX" className="h-8 w-auto object-contain" />
+          <img src={logoImage} alt="PowerTradeFX" className="h-16 w-auto object-contain" />
         </div>
 
         {/* Menu */}

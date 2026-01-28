@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import logo from '../assets/PowerTradeFX.png'
+import { API_URL } from '../config/api'
 
 const AdminLogin = () => {
   const navigate = useNavigate()
@@ -23,7 +25,7 @@ const AdminLogin = () => {
     setError('')
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin-mgmt/login`, {
+      const response = await fetch(`${API_URL}/admin-mgmt/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -63,9 +65,9 @@ const AdminLogin = () => {
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img 
-            src="https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/render/image/public/document-uploads/PowerTradeFX-logo-1766736768413.png?width=8000&height=8000&resize=contain" 
+            src={logo} 
             alt="PowerTradeFX Logo" 
-            className="h-12 w-auto object-contain"
+            className="h-16 w-auto object-contain"
           />
         </div>
 

@@ -11,18 +11,15 @@ const createSuperAdmin = async () => {
     await mongoose.connect(process.env.MONGODB_URI)
     console.log('Connected to MongoDB')
 
-    // Check if super admin already exists
-    const existingAdmin = await Admin.findOne({ role: 'SUPER_ADMIN' })
-    if (existingAdmin) {
-      console.log('Super Admin already exists:', existingAdmin.email)
-      process.exit(0)
-    }
-
-    // Create super admin
     const hashedPassword = await bcrypt.hash('Admin@123', 10)
-    
-    const superAdmin = new Admin({
-      email: 'admin@powertradefx.com',
+
+    const superAdminEmail = 'admin@powertradefx.com'
+
+    const existingByEmail = await Admin.findOne({ email: superAdminEmail })
+    const existingByRole = await Admin.findOne({ role: 'SUPER_ADMIN' })
+
+    const baseAdminData = {
+      email: superAdminEmail,
       password: hashedPassword,
       firstName: 'Super',
       lastName: 'Admin',
@@ -62,18 +59,32 @@ const createSuperAdmin = async () => {
         canManageAdmins: true,
         canFundAdmins: true
       }
-    })
+    }
 
-    await superAdmin.save()
-    console.log('Super Admin created successfully!')
+    const adminToUse = existingByEmail || existingByRole
 
-    // Create admin wallet
-    const adminWallet = new AdminWallet({
-      adminId: superAdmin._id,
-      balance: 0
-    })
-    await adminWallet.save()
-    console.log('Admin wallet created!')
+    let superAdmin = null
+    if (adminToUse) {
+      superAdmin = adminToUse
+      Object.assign(superAdmin, baseAdminData)
+      await superAdmin.save()
+      console.log('Super Admin updated/reset successfully!')
+    } else {
+      superAdmin = new Admin(baseAdminData)
+      await superAdmin.save()
+      console.log('Super Admin created successfully!')
+    }
+
+    // Ensure admin wallet exists
+    const existingWallet = await AdminWallet.findOne({ adminId: superAdmin._id })
+    if (!existingWallet) {
+      const adminWallet = new AdminWallet({
+        adminId: superAdmin._id,
+        balance: 0
+      })
+      await adminWallet.save()
+      console.log('Admin wallet created!')
+    }
 
     console.log('\n========================================')
     console.log('Admin Credentials:')
