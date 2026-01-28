@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
           if (bankSettings.bankName && bankSettings.accountNumber) {
             paymentMethods.push({
               _id: 'admin-bank',
-              type: 'bank',
+              type: 'Bank Transfer',
               bankName: bankSettings.bankName,
               accountNumber: bankSettings.accountNumber,
               accountHolderName: bankSettings.accountName,
@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
           if (bankSettings.upiId) {
             paymentMethods.push({
               _id: 'admin-upi',
-              type: 'upi',
+              type: 'UPI',
               upiId: bankSettings.upiId,
               qrCodeImage: bankSettings.upiQrCode,
               isActive: true
@@ -65,8 +65,7 @@ router.get('/', async (req, res) => {
           
           return res.json({ paymentMethods, isAdminSpecific: true })
         }
-        // If admin has not configured bank settings, return empty
-        return res.json({ paymentMethods: [], isAdminSpecific: true, notConfigured: true })
+        // If admin has not configured bank settings, fall back to global payment methods
       }
     }
     
