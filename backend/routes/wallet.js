@@ -405,11 +405,19 @@ router.put('/admin/approve/:id', async (req, res) => {
       return res.status(400).json({ message: 'Transaction already processed' })
     }
 
-    const wallet = await Wallet.findById(transaction.walletId)
-    
     // Get the user to check if they have an assigned admin
     const user = await User.findById(transaction.userId)
     const assignedAdminId = user?.assignedAdmin
+
+    // Find wallet - try walletId first, fallback to userId
+    let wallet = transaction.walletId 
+      ? await Wallet.findById(transaction.walletId)
+      : await Wallet.findOne({ userId: transaction.userId })
+    
+    if (!wallet) {
+      wallet = new Wallet({ userId: transaction.userId, balance: 0 })
+      await wallet.save()
+    }
 
     if (transaction.type === 'Deposit') {
       // Add deposit amount + bonus to wallet balance
