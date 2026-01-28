@@ -266,7 +266,7 @@ router.put('/approve/:kycId', async (req, res) => {
           documentType: kyc.documentType,
           approvedAt: new Date().toLocaleString(),
           platformName: settings?.platformName || 'PowerTradeFX',
-          loginUrl: settings?.loginUrl || 'https://PowerTradeFX.com/login',
+          loginUrl: settings?.loginUrl || 'https://powertradefx.com/user/login',
           supportEmail: settings?.supportEmail || 'support@PowerTradeFX.com',
           year: new Date().getFullYear().toString()
         })
@@ -330,7 +330,7 @@ router.put('/reject/:kycId', async (req, res) => {
           rejectionReason: kyc.rejectionReason,
           rejectedAt: new Date().toLocaleString(),
           platformName: settings?.platformName || 'PowerTradeFX',
-          loginUrl: settings?.loginUrl || 'https://PowerTradeFX.com/login',
+          loginUrl: settings?.loginUrl || 'https://powertradefx.com/user/login',
           supportEmail: settings?.supportEmail || 'support@PowerTradeFX.com',
           year: new Date().getFullYear().toString()
         })

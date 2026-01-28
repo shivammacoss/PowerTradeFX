@@ -489,7 +489,7 @@ class PropTradingEngine {
             failureReason: breachReason,
             failureDate: account.failedAt.toLocaleDateString(),
             platformName: 'PowerTradeFX',
-            loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
+            loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/user/login`,
             supportEmail: 'support@PowerTradeFX.com',
             year: new Date().getFullYear().toString()
           })
@@ -559,7 +559,7 @@ class PropTradingEngine {
               accountId: account.accountId,
               completionDate: account.passedAt.toLocaleDateString(),
               platformName: 'PowerTradeFX',
-              loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
+              loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/user/login`,
               supportEmail: 'support@PowerTradeFX.com',
               year: new Date().getFullYear().toString()
             })
@@ -640,7 +640,7 @@ class PropTradingEngine {
           accountId: account.accountId,
           completionDate: account.passedAt.toLocaleDateString(),
           platformName: 'PowerTradeFX',
-          loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
+          loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/user/login`,
           supportEmail: 'support@PowerTradeFX.com',
           year: new Date().getFullYear().toString()
         })
@@ -683,7 +683,7 @@ class PropTradingEngine {
           failureReason: account.failReason,
           failureDate: account.failedAt.toLocaleDateString(),
           platformName: 'PowerTradeFX',
-          loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
+          loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/user/login`,
           supportEmail: 'support@PowerTradeFX.com',
           year: new Date().getFullYear().toString()
         })
@@ -881,7 +881,7 @@ class PropTradingEngine {
             failureReason: account.failReason,
             failureDate: account.failedAt.toLocaleDateString(),
             platformName: 'PowerTradeFX',
-            loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
+            loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/user/login`,
             supportEmail: 'support@PowerTradeFX.com',
             year: new Date().getFullYear().toString()
           })

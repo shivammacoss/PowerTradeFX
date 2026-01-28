@@ -875,17 +875,12 @@ router.post('/:id/test', async (req, res) => {
     // Generate sample data for template variables
     const sampleData = {
       firstName: 'John',
-      email: toEmail,
-      otp: '123456',
-      expiryMinutes: '10',
       amount: '500.00',
-      transactionId: 'TXN' + Date.now(),
-      paymentMethod: 'Bank Transfer',
-      date: new Date().toLocaleDateString(),
+      currency: 'USD',
       newBalance: '1,500.00',
       platformName: settings.fromName || 'Trading Platform',
       supportEmail: settings.fromEmail || 'support@example.com',
-      loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/login`,
+      loginUrl: `${process.env.FRONTEND_URL || 'https://powertradefx.com'}/user/login`,
       reason: 'Violation of terms of service',
       year: new Date().getFullYear().toString()
     }

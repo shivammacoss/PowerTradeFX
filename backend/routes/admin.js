@@ -450,7 +450,7 @@ router.put('/users/:id/ban', async (req, res) => {
           reason: reason || 'Policy violation',
           date: new Date().toLocaleString(),
           platformName: settings?.platformName || 'PowerTradeFX',
-          loginUrl: settings?.loginUrl || 'https://PowerTradeFX.com/login',
+          loginUrl: settings?.loginUrl || 'https://powertradefx.com/user/login',
           supportEmail: settings?.supportEmail || 'support@PowerTradeFX.com',
           year: new Date().getFullYear().toString()
         })
