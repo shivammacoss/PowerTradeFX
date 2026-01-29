@@ -86,7 +86,7 @@ const AdminFundManagement = () => {
 
   const handleApprove = async (txnId) => {
     try {
-      const res = await fetch(`${API_URL}/wallet/admin/approve/${txnId}`, {
+      const res = await fetch(`${API_URL}/wallet/transaction/${txnId}/approve`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adminRemarks: '' })
@@ -107,7 +107,7 @@ const AdminFundManagement = () => {
   const handleReject = async (txnId) => {
     const remarks = prompt('Enter rejection reason (optional):')
     try {
-      const res = await fetch(`${API_URL}/wallet/admin/reject/${txnId}`, {
+      const res = await fetch(`${API_URL}/wallet/transaction/${txnId}/reject`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ adminRemarks: remarks || '' })
